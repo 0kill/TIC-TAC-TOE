@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe PvP</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #282C34; /* Dark background for contrast */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            color: #F0F0F0;
+        }
+        .game-container {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-template-rows: repeat(3, 100px);
+            gap: 10px;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            background-color: #3DC9E8; /* Cool Cyan */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 40px;
+            cursor: pointer;
+            border-radius: 10px;
+            color: #282C34;
+            border: 3px solid #000;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+            transition: background-color 0.3s;
+        }
+        .cell:hover {
+            background-color: #29A7C4; /* Darker Cyan when hovered */
+        }
+        #status {
+            margin-top: 20px;
+            font-size: 24px;
+            color: #A7F3FF; /* Baby Blue */
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4C0051; /* Eggplant color */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        button:hover {
+            background-color: #660066; /* Darker Eggplant on hover */
+        }
+    </style>
+</head>
+<body>
+    <div class="game">
+        <div class="game-container" id="gameContainer"></div>
+        <div id="status">Player X's Turn</div>
+        <button id="resetButton">Reset Game</button>
+    </div>
+
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const statusText = document.getElementById('status');
+        const resetButton = document.getElementById('resetButton');
+
+        let currentPlayer = 'X';
+        let board = ['', '', '', '', '', '', '', '', ''];
+        let gameActive = true;
+
+        const winningConditions = [
+            [0, 1, 2],
+            [3, 4, 5],
+            [6, 7, 8],
+            [0, 3, 6],
+            [1, 4, 7],
+            [2, 5, 8],
+            [0, 4, 8],
+            [2, 4, 6],
+        ];
+
+        function handleCellClick(e) {
+            const clickedCell = e.target;
+            const clickedIndex = Array.from(gameContainer.children).indexOf(clickedCell);
+
+            if (board[clickedIndex] !== '' || !gameActive) return;
+
+            board[clickedIndex] = currentPlayer;
+            clickedCell.textContent = currentPlayer;
+
+            checkWinner();
+        }
+
+        function checkWinner() {
+            let roundWon = false;
+
+            for (let i = 0; i < winningConditions.length; i++) {
+                const [a, b, c] = winningConditions[i];
+                if (board[a] && board[a] === board[b] && board[a] === board[c]) {
+                    roundWon = true;
+                    break;
+                }
+            }
+
+            if (roundWon) {
+                statusText.textContent = `Player ${currentPlayer} Wins!`;
+                gameActive = false;
+            } else if (!board.includes('')) {
+                statusText.textContent = `It's a Tie!`;
+                gameActive = false;
+            } else {
+                currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+                statusText.textContent = `Player ${currentPlayer}'s Turn`;
+            }
+        }
+
+        function resetGame() {
+            board = ['', '', '', '', '', '', '', '', ''];
+            currentPlayer = 'X';
+            gameActive = true;
+            statusText.textContent = `Player X's Turn`;
+            Array.from(gameContainer.children).forEach(cell => (cell.textContent = ''));
+        }
+
+        function initGame() {
+            gameContainer.innerHTML = '';
+            for (let i = 0; i < 9; i++) {
+                const cell = document.createElement('div');
+                cell.classList.add('cell');
+                cell.addEventListener('click', handleCellClick);
+                gameContainer.appendChild(cell);
+            }
+        }
+
+        resetButton.addEventListener('click', resetGame);
+        initGame();
+    </script>
+</body>
+</html>
